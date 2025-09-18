@@ -1,0 +1,30 @@
+name: Generate Daily Keys
+
+on:
+  schedule:
+    - cron: "0 0 * * *" # jalan tiap hari jam 00:00 UTC
+  workflow_dispatch: # bisa dijalankan manual juga
+
+jobs:
+  update-keys:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Generate new keys
+        run: |
+          # Buat key acak
+          KEY1=$(openssl rand -hex 8)"
+
+          echo "{
+            \"1day_key\": \"$KEY1\"
+	}" > keys.json
+
+      - name: Commit and push
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add keys.json
+          git commit -m "🔑 Auto-update keys"
+          git push
